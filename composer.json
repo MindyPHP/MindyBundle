@@ -10,25 +10,25 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
-        "symfony/framework-bundle": "~3.0",
-        "symfony/swiftmailer-bundle": "~2.4",
-        "mindy/template-bundle": "~3.0",
-        "symfony/asset": "~3.0",
-        "mindy/orm-bundle": "~3.0"
+        "php": ">=7.0",
+        "symfony/framework-bundle": "~3.0|~4.0",
+        "symfony/asset": "~3.0|~4.0",
+        "symfony/web-link": "~3.0|~4.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "*"
+        "symfony/var-dumper": "~3.0|~4.0",
+        "phpunit/phpunit": "^6.5",
+        "mindy/template-bundle": ">=4.0.1",
+        "symfony/security-bundle": "^3.4"
     },
     "autoload": {
         "psr-4": {
             "Mindy\\Bundle\\MindyBundle\\": ""
         }
     },
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "3.6.8-dev"
+    "autoload-dev": {
+        "psr-4": {
+            "Mindy\\Bundle\\MindyBundle\\Tests\\": ""
         }
     }
 }

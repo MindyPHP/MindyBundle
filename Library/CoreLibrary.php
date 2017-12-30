@@ -1,25 +1,66 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * (c) Studio107 <mail@studio107.ru> http://studio107.ru
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * This file is part of Mindy Framework.
+ * (c) 2017 Maxim Falaleev
  *
- * Author: Maxim Falaleev <max@studio107.ru>
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Mindy\Bundle\MindyBundle\Library;
 
-use Mindy\Template\Library;
+use Mindy\Template\Library\AbstractLibrary;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
 
-class CoreLibrary extends Library implements ContainerAwareInterface
+class CoreLibrary extends AbstractLibrary implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
+
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
+    /**
+     * @var Translator
+     */
+    protected $translator;
+    /**
+     * @var AuthorizationCheckerInterface
+     */
+    protected $authorizationChecker;
+    /**
+     * @var TokenStorage
+     */
+    protected $tokenStorage;
+
+    /**
+     * CoreLibrary constructor.
+     *
+     * @param RouterInterface               $router
+     * @param Translator                    $translator
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param TokenStorage                  $tokenStorage
+     */
+    public function __construct(
+        RouterInterface $router,
+        Translator $translator,
+        AuthorizationCheckerInterface $authorizationChecker = null,
+        TokenStorage $tokenStorage = null
+    ) {
+        $this->router = $router;
+        $this->translator = $translator;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->tokenStorage = $tokenStorage;
+    }
 
     /**
      * @return array
@@ -28,11 +69,8 @@ class CoreLibrary extends Library implements ContainerAwareInterface
     {
         return [
             'switched_user' => function () {
-                $authChecker = $this->container->get('security.authorization_checker');
-                $tokenStorage = $this->container->get('security.token_storage');
-
-                if ($authChecker->isGranted('ROLE_PREVIOUS_ADMIN')) {
-                    foreach ($tokenStorage->getToken()->getRoles() as $role) {
+                if ($this->authorizationChecker->isGranted('ROLE_PREVIOUS_ADMIN')) {
+                    foreach ($this->tokenStorage->getToken()->getRoles() as $role) {
                         if ($role instanceof SwitchUserRole) {
                             return $role->getSource()->getUser();
                         }
@@ -41,43 +79,22 @@ class CoreLibrary extends Library implements ContainerAwareInterface
 
                 return null;
             },
-            'is_granted' => function ($attributes, $object = null) {
-                if (!$this->container->has('security.authorization_checker')) {
-                    throw new \LogicException('The SecurityBundle is not registered in your application.');
-                }
-
-                return $this->container->get('security.authorization_checker')->isGranted($attributes, $object);
-            },
-            'path' => function ($route, array $parameters = []) {
-                return $this->container->get('router')->generate($route, $parameters);
-            },
-            'url' => function ($route, array $parameters = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH) {
-                return $this->container->get('router')->generate($route, $parameters, $referenceType);
-            },
-            'rand' => function ($min, $max) {
-                return rand($min, $max);
-            },
-            'd' => function () {
-                dump(func_get_args());
-                die();
-            },
-            't' => function ($id, array $parameters = [], $domain = null, $locale = null) {
-                return $this->container->get('translator')->trans($id, $parameters, $domain, $locale);
-            },
-            'trans' => function ($id, array $parameters = [], $domain = null, $locale = null) {
-                return $this->container->get('translator')->trans($id, $parameters, $domain, $locale);
-            },
-            'transChoice' => function ($id, $number, array $parameters = [], $domain = null, $locale = null) {
-                return $this->container->get('translator')->transChoice($id, $number, $parameters, $domain, $locale);
-            },
+            'is_granted' => [$this->authorizationChecker, 'isGranted'],
+            'path' => [$this->router, 'generate'],
+            'url' => [$this->router, 'generate'],
+            'd' => [$this, 'dump'],
+            't' => [$this->translator, 'trans'],
+            'trans' => [$this->translator, 'trans'],
+            'transChoice' => [$this->translator, 'transChoice'],
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getTags()
+    public function dump(...$arguments)
     {
-        return [];
+        if (function_exists('dump')) {
+            dump($arguments);
+        } else {
+            var_dump($arguments);
+        }
     }
 }
