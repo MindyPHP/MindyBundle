@@ -26,6 +26,7 @@ class WebLinkLibrary extends AbstractLibrary
 
     /**
      * WebLinkLibrary constructor.
+     *
      * @param RequestStack $requestStack
      */
     public function __construct(RequestStack $requestStack)

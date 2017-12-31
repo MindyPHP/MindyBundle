@@ -1,17 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * (c) Studio107 <mail@studio107.ru> http://studio107.ru
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * This file is part of Mindy Framework.
+ * (c) 2017 Maxim Falaleev
  *
- * Author: Maxim Falaleev <max@studio107.ru>
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
-namespace Mindy\Bundle\MindyBundle\EventListener;
+namespace Mindy\Bundle\MindyBundle\EventSubscriber;
 
-use Mindy\Template\Renderer;
+use Mindy\Template\TemplateEngine;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -19,21 +22,57 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Throwable;
 
-class ExceptionListener
+class ExceptionEventSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var TemplateEngine
+     */
     protected $template;
+
+    /**
+     * @var LoggerInterface
+     */
     protected $logger;
+
+    /**
+     * @var string
+     */
     protected $path;
 
-    public function __construct(Renderer $template, LoggerInterface $logger, $path = 'mindy/error/%s.html')
-    {
+    /**
+     * @var bool
+     */
+    protected $enable = false;
+
+    /**
+     * ExceptionListener constructor.
+     *
+     * @param TemplateEngine $template
+     * @param LoggerInterface $logger
+     * @param string $path
+     * @param bool $enable
+     */
+    public function __construct(
+        TemplateEngine $template,
+        LoggerInterface $logger,
+        $path = 'mindy/error/%s.html',
+        $enable = false
+    ) {
         $this->template = $template;
         $this->logger = $logger;
         $this->path = $path;
+        $this->enable = $enable;
     }
 
+    /**
+     * @param GetResponseForExceptionEvent $event
+     */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
+        if (false === $this->enable) {
+            return;
+        }
+
         // You get the exception object from the received event
         $exception = $event->getException();
 
@@ -58,6 +97,11 @@ class ExceptionListener
         $event->setResponse($response);
     }
 
+    /**
+     * @param Throwable $exception
+     *
+     * @return string
+     */
     protected function renderException(Throwable $exception)
     {
         $code = Response::HTTP_INTERNAL_SERVER_ERROR;
@@ -72,11 +116,24 @@ class ExceptionListener
         ]);
     }
 
+    /**
+     * @param Throwable $exception
+     */
     protected function logException(Throwable $exception)
     {
         $this->logger->error($exception->getMessage(), [
             'line' => $exception->getLine(),
             'file' => $exception->getFile(),
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            'kernel.exception' => 'onKernelException',
+        ];
     }
 }

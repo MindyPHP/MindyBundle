@@ -1,3 +1,6 @@
+parameters:
+    mindy.exception_listener.enable: false
+
 services:
     _defaults:
         autowire: true
@@ -7,3 +10,7 @@ services:
     Mindy\Bundle\MindyBundle\:
         resource: '../../*'
         exclude: '../../{Model,Tests,vendor}'
+
+    Mindy\Bundle\MindyBundle\EventSubscriber\ExceptionEventSubscriber:
+        arguments:
+            $enable: '%mindy.exception_listener.enable%'
