@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -47,21 +48,21 @@ class ExceptionSubscriberTest extends TestCase
 
         $subscriber = new ExceptionEventSubscriber($templateEngine, $logger, '%s.html', false);
 
-        $event = new GetResponseForExceptionEvent($kernel, new Request(), 'POST', new \Exception('test'));
+        $event = new GetResponseForExceptionEvent($kernel, new Request(), HttpKernelInterface::SUB_REQUEST, new \Exception('test'));
         $subscriber->onKernelException($event);
         $this->assertNull($event->getResponse());
 
         $subscriber = new ExceptionEventSubscriber($templateEngine, $logger, '%s.html', true);
 
-        $event = new GetResponseForExceptionEvent($kernel, new Request(), 'POST', new \Exception('test'));
+        $event = new GetResponseForExceptionEvent($kernel, new Request(), HttpKernelInterface::SUB_REQUEST, new \Exception('test'));
         $subscriber->onKernelException($event);
         $this->assertSame('500.html', $event->getResponse()->getContent());
 
-        $event = new GetResponseForExceptionEvent($kernel, new Request(), 'POST', new NotFoundHttpException());
+        $event = new GetResponseForExceptionEvent($kernel, new Request(), HttpKernelInterface::SUB_REQUEST, new NotFoundHttpException());
         $subscriber->onKernelException($event);
         $this->assertSame('404.html', $event->getResponse()->getContent());
 
-        $event = new GetResponseForExceptionEvent($kernel, new Request(), 'POST', new AccessDeniedException());
+        $event = new GetResponseForExceptionEvent($kernel, new Request(), HttpKernelInterface::SUB_REQUEST, new AccessDeniedException());
         $subscriber->onKernelException($event);
         $this->assertSame('403.html', $event->getResponse()->getContent());
     }
