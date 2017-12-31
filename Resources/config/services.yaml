@@ -12,5 +12,6 @@ services:
         exclude: '../../{Model,Tests,vendor}'
 
     Mindy\Bundle\MindyBundle\EventSubscriber\ExceptionEventSubscriber:
+        public: true
         arguments:
             $enable: '%mindy.exception_listener.enable%'
