@@ -35,9 +35,8 @@ class KernelTest extends KernelTestCase
 
         $container = $kernel->getContainer();
 
-        $this->assertInstanceOf(
-            ExceptionEventSubscriber::class,
-            $container->get(ExceptionEventSubscriber::class)
+        $this->assertTrue(
+            $container->has(ExceptionEventSubscriber::class)
         );
     }
 }
