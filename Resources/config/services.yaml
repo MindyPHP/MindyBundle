@@ -7,6 +7,11 @@ services:
         autoconfigure: true
         public: false
 
+    _instanceof:
+        Mindy\Template\Library\LibraryInterface:
+            public: true
+            tags: ['template.library']
+
     Mindy\Bundle\MindyBundle\:
         resource: '../../*'
         exclude: '../../{Model,Tests,vendor}'
