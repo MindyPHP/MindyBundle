@@ -15,3 +15,5 @@ Resources
   * [Report issues](https://github.com/MindyPHP/mindy/issues) and
     [send Pull Requests](https://github.com/MindyPHP/mindy/pulls)
     in the [main Mindy repository](https://github.com/MindyPHP/mindy)
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMindyPHP%2FMindyBundle.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FMindyPHP%2FMindyBundle?ref=badge_large)
