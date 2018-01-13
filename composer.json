@@ -20,7 +20,9 @@
         "symfony/var-dumper": "~3.0|~4.0",
         "phpunit/phpunit": "^6.5",
         "mindy/template-bundle": ">=4.0.1",
-        "symfony/security-bundle": "^3.4"
+        "symfony/security-bundle": "^3.4",
+        "mindy/pagination-bundle": "~4.0",
+        "symfony/translation": "~3.0|~4.0"
     },
     "autoload": {
         "psr-4": {

@@ -1,2 +1,9 @@
 parameters:
     kernel.secret: 123
+
+framework:
+    router:
+        strict_requirements: true
+        resource: "%kernel.project_dir%/routing.yaml"
+    translator:
+        fallbacks: [en]

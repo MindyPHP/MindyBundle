@@ -14,17 +14,13 @@ namespace Mindy\Bundle\MindyBundle\Library;
 
 use Mindy\Template\Library\AbstractLibrary;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Role\SwitchUserRole;
 
-class CoreLibrary extends AbstractLibrary implements ContainerAwareInterface
+class CoreLibrary extends AbstractLibrary
 {
-    use ContainerAwareTrait;
-
     /**
      * @var RouterInterface
      */
