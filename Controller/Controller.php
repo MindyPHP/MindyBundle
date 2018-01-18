@@ -24,10 +24,17 @@ if (false === trait_exists(PaginationTrait::class)) {
 
 /**
  * Class Controller
- *
- * @deprecated since 4.0
  */
 abstract class Controller extends BaseController
 {
     use PaginationTrait;
+
+    /**
+     * {@inheritdoc}
+     * {@see Controller::renderView}
+     */
+    public function renderTemplate($view, array $parameters = array())
+    {
+        return parent::renderView($view, $parameters);
+    }
 }
